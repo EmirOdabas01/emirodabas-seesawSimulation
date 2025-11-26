@@ -52,6 +52,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  z-index: 2;
 }
 
 #seesaw-container {
@@ -77,4 +78,16 @@ body {
   position: absolute;
   background-color: rgb(149, 165, 165);
   bottom: 0%;
+}
+
+#seesaw-pivot {
+  width: 30px;
+  height: 30px;
+  background-color: rgb(53, 74, 95);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  z-index: 1;
 }
