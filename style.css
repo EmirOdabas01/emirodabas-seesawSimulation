@@ -1,0 +1,44 @@
+.app-container {
+  max-width: 900px;
+  margin: 36px auto;
+  padding: 20px;
+}
+
+#info-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  background-color: aquamarine;
+  padding: 12px;
+}
+
+.info-box {
+  padding: 5px;
+  background: white;
+  border: 2px solid black;
+  border-radius: 3px;
+  text-align: center;
+  flex: 1;
+}
+
+.info-label {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 15px;
+}
+
+#seesaw-container {
+  width: 400px;
+  margin-top: 20px;
+}
+
+#seesaw-plank {
+  width: 400px;
+  height: 20px;
+  background-color: brown;
+}
+
+#seesaw-pivot {
+  width: 20px;
+  height: 20px;
+  background-color: blue;
+}
