@@ -1,44 +1,45 @@
-.app-container {
-  max-width: 900px;
-  margin: 36px auto;
+* {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+body {
+  background-color: rgb(246, 247, 251);
+}
+
+#app-container {
+  max-width: 800px;
+  height: auto;
+  background-color: white;
   padding: 20px;
+  margin: 20px auto;
+}
+
+.info-box {
+  width: 50px;
+  height: 60px;
+  background-color: rgb(248, 249, 251);
+  border-radius: 5px;
+  border: 2px solid rgb(232, 236, 239);
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+  flex: 1;
+  margin-left: 20px;
+  margin-right: 20pxs;
 }
 
 #info-panel {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  background-color: aquamarine;
-  padding: 12px;
+  justify-content: space-around;
+  gap: 50px;
 }
 
-.info-box {
-  padding: 5px;
-  background: white;
-  border: 2px solid black;
-  border-radius: 3px;
-  text-align: center;
-  flex: 1;
+.info-value {
+  font-size: 20px;
+  color: rgb(46, 62, 78);
 }
-
 .info-label {
-  font-family: Georgia, "Times New Roman", Times, serif;
   font-size: 15px;
-}
 
-#seesaw-container {
-  width: 400px;
-  margin-top: 20px;
-}
-
-#seesaw-plank {
-  width: 400px;
-  height: 20px;
-  background-color: brown;
-}
-
-#seesaw-pivot {
-  width: 20px;
-  height: 20px;
-  background-color: blue;
+  color: rgb(122, 129, 134);
 }
