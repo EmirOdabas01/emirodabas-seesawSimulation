@@ -6,6 +6,7 @@ const seesawComponents = {
   angle: document.querySelectorAll(".info-value")[3],
   leftWeightsSumVal: document.querySelectorAll(".info-value")[0],
   rightWeightsSumVal: document.querySelectorAll(".info-value")[2],
+  log: document.getElementById("log"),
   colors: [
     "#3498db",
     "#e74c3c",
@@ -80,9 +81,9 @@ seesawComponents.plank.addEventListener("mouseleave", () => {
   seesawComponents.nextWeightDisplay.style.display = "none";
 });
 
-seesawComponents.plank.addEventListener("click", (e) => {
+seesawComponents.plank.addEventListener("click", (event) => {
   const rect = seesawComponents.plank.getBoundingClientRect();
-  const x = e.clientX - rect.left;
+  const x = event.clientX - rect.left;
 
   if (x < 0 || x > rect.width) return;
 
@@ -107,6 +108,7 @@ seesawComponents.plank.addEventListener("click", (e) => {
   }
 
   createObjectDOM(newObject, true);
+  createLogMessage(side, weight);
   updateSimulation();
   generateNextWeight();
   updateUI();
@@ -165,6 +167,7 @@ function renderAllObjects() {
 
   updateSimulation();
 }
+
 seesawComponents.resetButton.addEventListener("click", () => {
   appState.leftWeights = [];
   appState.rightWeights = [];
@@ -180,4 +183,11 @@ seesawComponents.resetButton.addEventListener("click", () => {
   updateUI();
 });
 
+function createLogMessage(side, weight) {
+  const logDiv = document.createElement("div");
+  logDiv.classList.add("log-item");
+  let sideName = side === "left" ? "left" : "right";
+  logDiv.innerText = `${weight} kg is added to the ${sideName} side`;
+  seesawComponents.log.prepend(logDiv);
+}
 init();
