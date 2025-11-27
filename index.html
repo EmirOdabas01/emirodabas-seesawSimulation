@@ -1,49 +1,59 @@
 <!DOCTYPE html>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Seesaw Simulation</title>
+
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <main id="app-container">
       <div id="info-panel">
         <div class="info-box">
           <div class="info-label">LEFT WEIGHT</div>
+
           <div class="info-value">10</div>
         </div>
 
         <div class="info-box">
           <div class="info-label">NEXT WEIGHT</div>
+
           <div class="info-value">10</div>
         </div>
 
         <div class="info-box">
           <div class="info-label">RIGHT WEIGHT</div>
+
           <div class="info-value">10</div>
         </div>
 
         <div class="info-box">
           <div class="info-label">TILT ANGLE</div>
+
           <div class="info-value">10</div>
         </div>
       </div>
 
-      <div id="seesaw-container">
-        <div id="seesaw-hitzone"></div>
-        <div id="seesaw-plank"></div>
-        <div id="seesaw-pivot"></div>
-        <div id="seesaw-ground"></div>
-        <div id="object"></div>
+      <div id="seesaw-container-wrapper">
+        <div id="seesaw-container">
+          <div id="object-preview"></div>
+          <div id="seesaw-plank"></div>
+          <div id="seesaw-pivot"></div>
+          <div id="seesaw-ground"></div>
+        </div>
       </div>
+
       <div id="control">
         <button id="button">🔄Reset Seesaw</button>
       </div>
-      <div id="log">
-        <div id="log-item">log item test</div>
-        <div id="log-item">log item test</div>
-      </div>
+
+      <div id="log"></div>
     </main>
+    <script src="app.js"></script>
   </body>
 </html>
