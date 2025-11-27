@@ -12,8 +12,18 @@ let appState = {
 };
 
 function init() {
-  generateNextWeight();
+  const savedState = localStorage.getItem("seesawState");
+
+  if (savedState) {
+    console.log(savedState);
+    generateNextWeight();
+  }
+
   updateUI();
+}
+
+function saveState() {
+  localStorage.setItem("seesawState", JSON.stringify(appState));
 }
 
 function generateNextWeight() {
@@ -37,8 +47,6 @@ elements.plank.addEventListener("mousemove", (event) => {
 elements.plank.addEventListener("mouseleave", () => {
   elements.objectPreview.style.display = "none";
 });
-
-init();
 
 elements.plank.addEventListener("click", (e) => {
   const rect = elements.plank.getBoundingClientRect();
@@ -70,6 +78,7 @@ elements.plank.addEventListener("click", (e) => {
   updateSimulation();
   generateNextWeight();
   updateUI();
+  saveState();
 });
 
 function createObjectDOM(obj, isNew = false) {
@@ -117,3 +126,5 @@ function updateSimulation() {
 
   updateUI();
 }
+
+init();
