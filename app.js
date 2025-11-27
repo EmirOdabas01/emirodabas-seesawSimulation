@@ -1,7 +1,11 @@
-const gameComponents = {
-  infoNext: document.querySelectorAll(".info-value")[1],
+const seesawComponents = {
+  nextWeightVal: document.querySelectorAll(".info-value")[1],
   nextWeightDisplay: document.getElementById("object-preview"),
   plank: document.getElementById("seesaw-plank"),
+  resetButton: document.getElementById("button"),
+  angle: document.querySelectorAll(".info-value")[3],
+  leftWeightsSumVal: document.querySelectorAll(".info-value")[0],
+  rightWeightsSumVal: document.querySelectorAll(".info-value")[2],
   colors: [
     "#3498db",
     "#e74c3c",
@@ -45,25 +49,39 @@ function generateNextWeight() {
 }
 
 function updateUI() {
-  gameComponents.infoNext.innerText = appState.nextWeight;
+  seesawComponents.nextWeightVal.innerText = appState.nextWeight;
+  seesawComponents.angle.innerText = Math.round(appState.angle);
+
+  let totalLeft = 0;
+  for (const obj of appState.leftWeights) {
+    totalLeft += obj.weight;
+  }
+
+  let totalRight = 0;
+  for (const obj of appState.rightWeights) {
+    totalRight += obj.weight;
+  }
+
+  seesawComponents.leftWeightsSumVal.innerText = totalLeft;
+  seesawComponents.rightWeightsSumVal.innerText = totalRight;
 }
 
-gameComponents.plank.addEventListener("mousemove", (event) => {
-  const rect = gameComponents.plank.getBoundingClientRect();
+seesawComponents.plank.addEventListener("mousemove", (event) => {
+  const rect = seesawComponents.plank.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const constrainedX = Math.max(0, Math.min(x, rect.width));
-  gameComponents.nextWeightDisplay.style.display = "flex";
-  gameComponents.nextWeightDisplay.style.left = constrainedX - 15 + "px";
-  gameComponents.nextWeightDisplay.style.top = "45%";
-  gameComponents.nextWeightDisplay.innerText = appState.nextWeight;
+  seesawComponents.nextWeightDisplay.style.display = "flex";
+  seesawComponents.nextWeightDisplay.style.left = constrainedX - 15 + "px";
+  seesawComponents.nextWeightDisplay.style.top = "45%";
+  seesawComponents.nextWeightDisplay.innerText = appState.nextWeight;
 });
 
-gameComponents.plank.addEventListener("mouseleave", () => {
-  gameComponents.nextWeightDisplay.style.display = "none";
+seesawComponents.plank.addEventListener("mouseleave", () => {
+  seesawComponents.nextWeightDisplay.style.display = "none";
 });
 
-gameComponents.plank.addEventListener("click", (e) => {
-  const rect = gameComponents.plank.getBoundingClientRect();
+seesawComponents.plank.addEventListener("click", (e) => {
+  const rect = seesawComponents.plank.getBoundingClientRect();
   const x = e.clientX - rect.left;
 
   if (x < 0 || x > rect.width) return;
@@ -109,7 +127,7 @@ function createObjectDOM(obj, isNew = false) {
     weightDivComponent.style.bottom = "20px";
   }
 
-  gameComponents.plank.appendChild(weightDivComponent);
+  seesawComponents.plank.appendChild(weightDivComponent);
 
   if (isNew) {
     setTimeout(() => {
@@ -119,7 +137,7 @@ function createObjectDOM(obj, isNew = false) {
 }
 
 function getWeightColor(weight) {
-  return gameComponents.colors[weight - 1];
+  return seesawComponents.colors[weight - 1];
 }
 function updateSimulation() {
   let leftTorque = 0;
@@ -136,7 +154,7 @@ function updateSimulation() {
   const rawAngle = torqueDifference / 10;
   const angle = Math.max(-30, Math.min(30, rawAngle));
   appState.angle = angle;
-  gameComponents.plank.style.transform = `translate(-50%, -50%) rotate(${appState.angle}deg)`;
+  seesawComponents.plank.style.transform = `translate(-50%, -50%) rotate(${appState.angle}deg)`;
 
   updateUI();
 }
@@ -147,4 +165,19 @@ function renderAllObjects() {
 
   updateSimulation();
 }
+seesawComponents.resetButton.addEventListener("click", () => {
+  appState.leftWeights = [];
+  appState.rightWeights = [];
+  appState.colors = [];
+  appState.angle = 0;
+
+  const objects = document.querySelectorAll(".object");
+  objects.forEach((obj) => obj.remove());
+  seesawComponents.plank.style.transform = "translate(-50%, -50%) rotate(0deg)";
+  localStorage.removeItem("seesawState");
+
+  generateNextWeight();
+  updateUI();
+});
+
 init();
