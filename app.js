@@ -1,21 +1,35 @@
-const elements = {
+const gameComponents = {
   infoNext: document.querySelectorAll(".info-value")[1],
-  objectPreview: document.getElementById("object-preview"),
+  nextWeightDisplay: document.getElementById("object-preview"),
   plank: document.getElementById("seesaw-plank"),
-  colors: ["green", "red", "blue", "orange", "purple", "yellow"],
+  colors: [
+    "#3498db",
+    "#e74c3c",
+    "#2ecc71",
+    "#9b59b6",
+    "#f1c40f",
+    "#1abc9c",
+    "#e67e22",
+    "#16a085",
+    "#832167ff",
+    "#d35400",
+  ],
 };
 
 let appState = {
   nextWeight: 0,
   leftWeights: [],
   rightWeights: [],
+  colors: [],
 };
 
 function init() {
-  const savedState = localStorage.getItem("seesawState");
+  const previousState = localStorage.getItem("seesawState");
 
-  if (savedState) {
-    console.log(savedState);
+  if (previousState) {
+    appState = JSON.parse(previousState);
+    renderAllObjects();
+  } else {
     generateNextWeight();
   }
 
@@ -31,25 +45,25 @@ function generateNextWeight() {
 }
 
 function updateUI() {
-  elements.infoNext.innerText = appState.nextWeight;
+  gameComponents.infoNext.innerText = appState.nextWeight;
 }
 
-elements.plank.addEventListener("mousemove", (event) => {
-  const rect = elements.plank.getBoundingClientRect();
+gameComponents.plank.addEventListener("mousemove", (event) => {
+  const rect = gameComponents.plank.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const constrainedX = Math.max(0, Math.min(x, rect.width));
-  elements.objectPreview.style.display = "flex";
-  elements.objectPreview.style.left = constrainedX - 15 + "px";
-  elements.objectPreview.style.top = "45%";
-  elements.objectPreview.innerText = appState.nextWeight;
+  gameComponents.nextWeightDisplay.style.display = "flex";
+  gameComponents.nextWeightDisplay.style.left = constrainedX - 15 + "px";
+  gameComponents.nextWeightDisplay.style.top = "45%";
+  gameComponents.nextWeightDisplay.innerText = appState.nextWeight;
 });
 
-elements.plank.addEventListener("mouseleave", () => {
-  elements.objectPreview.style.display = "none";
+gameComponents.plank.addEventListener("mouseleave", () => {
+  gameComponents.nextWeightDisplay.style.display = "none";
 });
 
-elements.plank.addEventListener("click", (e) => {
-  const rect = elements.plank.getBoundingClientRect();
+gameComponents.plank.addEventListener("click", (e) => {
+  const rect = gameComponents.plank.getBoundingClientRect();
   const x = e.clientX - rect.left;
 
   if (x < 0 || x > rect.width) return;
@@ -82,30 +96,30 @@ elements.plank.addEventListener("click", (e) => {
 });
 
 function createObjectDOM(obj, isNew = false) {
-  const element = document.createElement("div");
-  element.classList.add("object");
+  const weightDivComponent = document.createElement("div");
+  weightDivComponent.classList.add("object");
 
-  element.style.left = obj.position - 15 + "px";
-  element.style.backgroundColor = getWeightColor(obj.weight);
-  element.innerText = obj.weight;
+  weightDivComponent.style.left = obj.position - 15 + "px";
+  weightDivComponent.style.backgroundColor = getWeightColor(obj.weight);
+  weightDivComponent.innerText = obj.weight;
 
   if (isNew) {
-    element.style.bottom = "150px";
+    weightDivComponent.style.bottom = "150px";
   } else {
-    element.style.bottom = "20px";
+    weightDivComponent.style.bottom = "20px";
   }
 
-  elements.plank.appendChild(element);
+  gameComponents.plank.appendChild(weightDivComponent);
 
   if (isNew) {
     setTimeout(() => {
-      element.style.bottom = "20px";
+      weightDivComponent.style.bottom = "20px";
     }, 50);
   }
 }
 
-function getWeightColor() {
-  return elements.colors[Math.floor(Math.random() * elements.colors.length)];
+function getWeightColor(weight) {
+  return gameComponents.colors[weight - 1];
 }
 function updateSimulation() {
   let leftTorque = 0;
@@ -118,13 +132,19 @@ function updateSimulation() {
     rightTorque += obj.weight * obj.distance;
   });
 
-  const torqueDiff = rightTorque - leftTorque;
-  const rawAngle = torqueDiff / 10;
-  const clampedAngle = Math.max(-30, Math.min(30, rawAngle));
-  appState.angle = clampedAngle;
-  elements.plank.style.transform = `translate(-50%, -50%) rotate(${appState.angle}deg)`;
+  const torqueDifference = rightTorque - leftTorque;
+  const rawAngle = torqueDifference / 10;
+  const angle = Math.max(-30, Math.min(30, rawAngle));
+  appState.angle = angle;
+  gameComponents.plank.style.transform = `translate(-50%, -50%) rotate(${appState.angle}deg)`;
 
   updateUI();
 }
 
+function renderAllObjects() {
+  appState.leftWeights.forEach((obj) => createObjectDOM(obj), false);
+  appState.rightWeights.forEach((obj) => createObjectDOM(obj), false);
+
+  updateSimulation();
+}
 init();
