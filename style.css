@@ -1,6 +1,7 @@
 * {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
+
 body {
   background-color: rgb(246, 247, 251);
 }
@@ -36,6 +37,7 @@ body {
   font-size: 20px;
   color: rgb(46, 62, 78);
 }
+
 .info-label {
   font-size: 15px;
   color: rgb(122, 129, 134);
@@ -50,6 +52,8 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
+  position: relative;
+  transition: transform 0.5s ease-out;
 }
 
 #seesaw-container-wrapper {
@@ -134,15 +138,6 @@ body {
   padding: 5px 5px 5px 20px;
 }
 
-#object {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  z-index: 3;
-}
 #object-preview {
   position: absolute;
   display: none;
@@ -156,4 +151,18 @@ body {
   z-index: 1000;
   width: 30px;
   height: 30px;
+}
+
+.object {
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  z-index: 3;
+  transition: bottom 0.5s ease-in;
 }

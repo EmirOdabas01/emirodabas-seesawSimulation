@@ -36,3 +36,58 @@ elements.plank.addEventListener("mouseleave", () => {
 });
 
 init();
+
+elements.plank.addEventListener("click", (e) => {
+  const rect = elements.plank.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+
+  if (x < 0 || x > rect.width) return;
+
+  const weight = appState.nextWeight;
+  const plankLength = 400;
+  const pivotPoint = plankLength / 2;
+
+  const distanceFromPivot = Math.abs(x - pivotPoint);
+
+  const side = x < pivotPoint ? "left" : "right";
+
+  const newObject = {
+    id: Date.now(),
+    weight: weight,
+    distance: distanceFromPivot,
+    position: x,
+    side: side,
+  };
+
+  createObjectDOM(newObject, true);
+  generateNextWeight();
+  updateUI();
+});
+
+function createObjectDOM(obj, isNew = false) {
+  const element = document.createElement("div");
+  element.classList.add("object");
+
+  element.style.left = obj.position - 15 + "px";
+  element.style.backgroundColor = getWeightColor(obj.weight);
+  element.innerText = obj.weight;
+
+  if (isNew) {
+    element.style.bottom = "150px";
+  } else {
+    element.style.bottom = "20px";
+  }
+
+  elements.plank.appendChild(element);
+
+  if (isNew) {
+    setTimeout(() => {
+      element.style.bottom = "20px";
+    }, 50);
+  }
+}
+
+function getWeightColor(weight) {
+  if (weight <= 5) return "green";
+  return "red";
+}
