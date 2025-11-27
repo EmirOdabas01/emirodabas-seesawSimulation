@@ -38,7 +38,6 @@ body {
 }
 .info-label {
   font-size: 15px;
-
   color: rgb(122, 129, 134);
 }
 
@@ -53,7 +52,7 @@ body {
   z-index: 2;
 }
 
-#seesaw-container {
+#seesaw-container-wrapper {
   margin-top: 20px;
   height: 450px;
   border: 2px solid rgb(227, 232, 236);
@@ -65,7 +64,7 @@ body {
   border-radius: 5px;
 }
 
-#seesaw-hitzone {
+#seesaw-container {
   width: 400px;
   height: 100%;
   position: relative;
@@ -136,11 +135,25 @@ body {
 }
 
 #object {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  z-index: 3;
+}
+#object-preview {
+  position: absolute;
+  display: none;
+  background-color: rgba(52, 152, 219, 0.7);
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1000;
   width: 30px;
   height: 30px;
-  border-radius: 100%;
-  position: absolute;
-  top: 30%;
-  left: 30%;
-  background-color: black;
 }
