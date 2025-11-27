@@ -2,10 +2,13 @@ const elements = {
   infoNext: document.querySelectorAll(".info-value")[1],
   objectPreview: document.getElementById("object-preview"),
   plank: document.getElementById("seesaw-plank"),
+  colors: ["green", "red", "blue", "orange", "purple", "yellow"],
 };
 
 let appState = {
   nextWeight: 0,
+  leftWeights: [],
+  rightWeights: [],
 };
 
 function init() {
@@ -46,9 +49,7 @@ elements.plank.addEventListener("click", (e) => {
   const weight = appState.nextWeight;
   const plankLength = 400;
   const pivotPoint = plankLength / 2;
-
   const distanceFromPivot = Math.abs(x - pivotPoint);
-
   const side = x < pivotPoint ? "left" : "right";
 
   const newObject = {
@@ -59,7 +60,14 @@ elements.plank.addEventListener("click", (e) => {
     side: side,
   };
 
+  if (side === "left") {
+    appState.leftWeights.push(newObject);
+  } else {
+    appState.rightWeights.push(newObject);
+  }
+
   createObjectDOM(newObject, true);
+  updateSimulation();
   generateNextWeight();
   updateUI();
 });
@@ -87,7 +95,25 @@ function createObjectDOM(obj, isNew = false) {
   }
 }
 
-function getWeightColor(weight) {
-  if (weight <= 5) return "green";
-  return "red";
+function getWeightColor() {
+  return elements.colors[Math.floor(Math.random() * elements.colors.length)];
+}
+function updateSimulation() {
+  let leftTorque = 0;
+  appState.leftWeights.forEach((obj) => {
+    leftTorque += obj.weight * obj.distance;
+  });
+
+  let rightTorque = 0;
+  appState.rightWeights.forEach((obj) => {
+    rightTorque += obj.weight * obj.distance;
+  });
+
+  const torqueDiff = rightTorque - leftTorque;
+  const rawAngle = torqueDiff / 10;
+  const clampedAngle = Math.max(-30, Math.min(30, rawAngle));
+  appState.angle = clampedAngle;
+  elements.plank.style.transform = `translate(-50%, -50%) rotate(${appState.angle}deg)`;
+
+  updateUI();
 }
