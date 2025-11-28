@@ -172,8 +172,8 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 2px;
-  height: 500px;
-  background: linear-gradient(to bottom, #3498db, transparent);
+  height: var(--guide-height, 100px);
+  background: lightblue;
   pointer-events: none;
   z-index: -1;
 }

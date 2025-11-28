@@ -72,12 +72,28 @@ seesawComponents.container.addEventListener("mousemove", (e) => {
   const rect = seesawComponents.container.getBoundingClientRect();
 
   const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  let y = e.clientY - rect.top;
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  const distanceFromCenter = x - centerX;
+  const angleInRadians = appState.angle * (Math.PI / 180);
+  const verticalOffset = distanceFromCenter * Math.tan(angleInRadians);
+  const plankPositionY = centerY + verticalOffset - 10;
+  const limit = plankPositionY - 60;
 
+  if (y > limit) {
+    y = limit;
+  }
+
+  const guideHeight = plankPositionY - y;
   const constrainedX = Math.max(0, Math.min(x, rect.width));
   seesawComponents.nextWeightDisplay.style.display = "flex";
   seesawComponents.nextWeightDisplay.style.left = constrainedX - 15 + "px";
   seesawComponents.nextWeightDisplay.style.top = y - 15 + "px";
+  seesawComponents.nextWeightDisplay.style.setProperty(
+    "--guide-height",
+    guideHeight + "px"
+  );
   seesawComponents.nextWeightDisplay.innerText = appState.nextWeight;
 });
 
