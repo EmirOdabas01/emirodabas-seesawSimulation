@@ -34,6 +34,7 @@ const audio = {
 };
 
 function init() {
+  createRuler();
   const previousState = localStorage.getItem("seesawState");
 
   if (previousState) {
@@ -232,6 +233,7 @@ seesawComponents.resetButton.addEventListener("click", () => {
 
   const objects = document.querySelectorAll(".object");
   objects.forEach((obj) => obj.remove());
+  seesawComponents.log.innerHTML = "";
   seesawComponents.plank.style.transform = "translate(-50%, -50%) rotate(0deg)";
   localStorage.removeItem("seesawState");
 
@@ -243,8 +245,24 @@ function createLogMessage(side, weight) {
   const logDiv = document.createElement("div");
   logDiv.classList.add("log-item");
   let sideName = side === "left" ? "left" : "right";
-  logDiv.innerText = `${weight} kg is added to the ${sideName} side`;
+  logDiv.innerText = `📦${weight} kg is added to the ${sideName} side`;
   seesawComponents.log.prepend(logDiv);
 }
+function createRuler() {
+  const plankWidth = 400;
+  const distance = 20;
 
+  for (let i = distance; i < plankWidth; i += distance) {
+    if (i === plankWidth / 2) continue;
+
+    const line = document.createElement("div");
+    const unit = Math.abs(i - plankWidth / 2) / distance;
+
+    const label = document.createElement("div");
+    label.classList.add("scale-label");
+    label.style.left = i + "px";
+    label.innerText = unit;
+    seesawComponents.plank.appendChild(label);
+  }
+}
 init();
