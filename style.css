@@ -165,3 +165,15 @@ body {
   font-weight: bold;
   z-index: 3;
 }
+#object-preview::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 500px;
+  background: linear-gradient(to bottom, #3498db, transparent);
+  pointer-events: none;
+  z-index: -1;
+}

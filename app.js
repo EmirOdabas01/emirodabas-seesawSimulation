@@ -7,6 +7,7 @@ const seesawComponents = {
   leftWeightsSumVal: document.querySelectorAll(".info-value")[0],
   rightWeightsSumVal: document.querySelectorAll(".info-value")[2],
   log: document.getElementById("log"),
+  container: document.getElementById("seesaw-container"),
   colors: [
     "#3498db",
     "#e74c3c",
@@ -67,23 +68,22 @@ function updateUI() {
   seesawComponents.rightWeightsSumVal.innerText = totalRight;
 }
 
-seesawComponents.plank.addEventListener("mousemove", (event) => {
-  const rect = seesawComponents.plank.getBoundingClientRect();
-  const x = event.clientX - rect.left;
+seesawComponents.container.addEventListener("mousemove", (e) => {
+  const rect = seesawComponents.container.getBoundingClientRect();
+
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
   const constrainedX = Math.max(0, Math.min(x, rect.width));
   seesawComponents.nextWeightDisplay.style.display = "flex";
   seesawComponents.nextWeightDisplay.style.left = constrainedX - 15 + "px";
-  seesawComponents.nextWeightDisplay.style.top = "45%";
+  seesawComponents.nextWeightDisplay.style.top = y - 15 + "px";
   seesawComponents.nextWeightDisplay.innerText = appState.nextWeight;
 });
 
-seesawComponents.plank.addEventListener("mouseleave", () => {
-  seesawComponents.nextWeightDisplay.style.display = "none";
-});
-
-seesawComponents.plank.addEventListener("click", (event) => {
-  const rect = seesawComponents.plank.getBoundingClientRect();
-  const x = event.clientX - rect.left;
+seesawComponents.container.addEventListener("click", (e) => {
+  const rect = seesawComponents.container.getBoundingClientRect();
+  const x = e.clientX - rect.left;
 
   if (x < 0 || x > rect.width) return;
 
@@ -112,6 +112,10 @@ seesawComponents.plank.addEventListener("click", (event) => {
   generateNextWeight();
   updateUI();
   saveState();
+});
+
+seesawComponents.container.addEventListener("mouseleave", () => {
+  seesawComponents.nextWeightDisplay.style.display = "none";
 });
 
 function createObjectDOM(obj, isNew = false) {
@@ -208,4 +212,5 @@ function createLogMessage(side, weight) {
   logDiv.innerText = `${weight} kg is added to the ${sideName} side`;
   seesawComponents.log.prepend(logDiv);
 }
+
 init();
