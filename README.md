@@ -1,5 +1,9 @@
 Seesaw Simulation
 
+Live link:
+
+https://emirodabas01.github.io/emirodabas-seesawSimulation/
+
 My Approach:
 
 I followed the UI-First strategy and created UI elements first. It helped me to focus on logic and understanding of application needs.
