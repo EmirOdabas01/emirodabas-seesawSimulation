@@ -26,6 +26,7 @@ let appState = {
   leftWeights: [],
   rightWeights: [],
   colors: [],
+  angle: 0,
 };
 
 const audio = {
@@ -57,7 +58,7 @@ function generateNextWeight() {
 
 function updateUI() {
   seesawComponents.nextWeightVal.innerText = appState.nextWeight + " kg";
-  seesawComponents.angle.innerText = Math.round(appState.angle);
+  seesawComponents.angle.innerText = appState.angle.toFixed(1) + "°";
 
   let totalLeft = 0;
   for (const obj of appState.leftWeights) {
