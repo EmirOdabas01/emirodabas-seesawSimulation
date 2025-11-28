@@ -109,35 +109,53 @@ seesawComponents.plank.addEventListener("click", (event) => {
 
   createObjectDOM(newObject, true);
   createLogMessage(side, weight);
-  updateSimulation();
   generateNextWeight();
   updateUI();
   saveState();
 });
 
 function createObjectDOM(obj, isNew = false) {
-  const weightDivComponent = document.createElement("div");
-  weightDivComponent.classList.add("object");
+  const weightDiv = document.createElement("div");
+  weightDiv.classList.add("object");
 
-  weightDivComponent.style.left = obj.position - 15 + "px";
-  weightDivComponent.style.backgroundColor = getWeightColor(obj.weight);
-  weightDivComponent.innerText = obj.weight;
-
-  if (isNew) {
-    weightDivComponent.style.bottom = "150px";
-  } else {
-    weightDivComponent.style.bottom = "20px";
-  }
-
-  seesawComponents.plank.appendChild(weightDivComponent);
+  const size = 20 + (obj.weight - 1) * (20 / 9);
+  weightDiv.style.left = obj.position - size / 2 + "px";
+  weightDiv.style.top = (20 - size) / 2 + "px";
+  weightDiv.style.width = size + "px";
+  weightDiv.style.height = size + "px";
+  weightDiv.style.fontSize = size / 2 + "px";
+  weightDiv.innerText = obj.weight;
+  weightDiv.style.backgroundColor = getWeightColor(obj.weight);
+  seesawComponents.plank.appendChild(weightDiv);
 
   if (isNew) {
+    weightDiv.style.opacity = "0";
+
+    const rect = weightDiv.getBoundingClientRect();
+
+    const ghost = weightDiv.cloneNode(true);
+    ghost.style.opacity = "1";
+    ghost.style.position = "fixed";
+    ghost.style.zIndex = "1000";
+    ghost.style.margin = "0";
+    ghost.style.transform = "none";
+    ghost.style.left = rect.left + "px";
+    ghost.style.top = rect.top - 200 + "px";
+    ghost.style.transition = "top 0.5s ease-in";
+
+    document.body.appendChild(ghost);
+
+    requestAnimationFrame(() => {
+      ghost.style.top = rect.top + "px";
+    });
+
     setTimeout(() => {
-      weightDivComponent.style.bottom = "20px";
-    }, 50);
+      ghost.remove();
+      weightDiv.style.opacity = "1";
+      updateSimulation();
+    }, 500);
   }
 }
-
 function getWeightColor(weight) {
   return seesawComponents.colors[weight - 1];
 }
