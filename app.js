@@ -1,31 +1,32 @@
 const seesawComponents = {
+  leftWeightsSumVal: document.querySelectorAll(".info-value")[0],
   nextWeightVal: document.querySelectorAll(".info-value")[1],
+  rightWeightsSumVal: document.querySelectorAll(".info-value")[2],
+  angle: document.querySelectorAll(".info-value")[3],
   nextWeightDisplay: document.getElementById("object-preview"),
   plank: document.getElementById("seesaw-plank"),
   resetButton: document.getElementById("button"),
-  angle: document.querySelectorAll(".info-value")[3],
-  leftWeightsSumVal: document.querySelectorAll(".info-value")[0],
-  rightWeightsSumVal: document.querySelectorAll(".info-value")[2],
   log: document.getElementById("log"),
   container: document.getElementById("seesaw-container"),
-  colors: [
-    "#3498db",
-    "#e74c3c",
-    "#2ecc71",
-    "#9b59b6",
-    "#f1c40f",
-    "#1abc9c",
-    "#e67e22",
-    "#16a085",
-    "#832167ff",
-    "#d35400",
-  ],
 };
+
+const colors = [
+  "#3498db",
+  "#e74c3c",
+  "#2ecc71",
+  "#9b59b6",
+  "#f1c40f",
+  "#1abc9c",
+  "#e67e22",
+  "#16a085",
+  "#832167ff",
+  "#d35400",
+];
+
 let appState = {
   nextWeight: 0,
   leftWeights: [],
   rightWeights: [],
-  colors: [],
   angle: 0,
 };
 
@@ -34,18 +35,8 @@ const audio = {
   crack: new Audio("sounds/woodCrack.mp3"),
 };
 
-function init() {
-  createRuler();
-  const previousState = localStorage.getItem("seesawState");
-
-  if (previousState) {
-    appState = JSON.parse(previousState);
-    renderAllObjects();
-  } else {
-    generateNextWeight();
-  }
-
-  updateUI();
+function getWeightColor(weight) {
+  return colors[weight - 1];
 }
 
 function saveState() {
@@ -54,6 +45,32 @@ function saveState() {
 
 function generateNextWeight() {
   appState.nextWeight = Math.floor(Math.random() * 10) + 1;
+}
+
+function createRuler() {
+  const plankWidth = 400;
+  const distance = 20;
+
+  for (let i = distance; i < plankWidth; i += distance) {
+    if (i === plankWidth / 2) continue;
+
+    const line = document.createElement("div");
+    const unit = Math.abs(i - plankWidth / 2) / distance;
+
+    const label = document.createElement("div");
+    label.classList.add("scale-label");
+    label.style.left = i + "px";
+    label.innerText = unit;
+    seesawComponents.plank.appendChild(label);
+  }
+}
+
+function createLogMessage(side, weight) {
+  const logDiv = document.createElement("div");
+  logDiv.classList.add("log-item");
+  let sideName = side === "left" ? "left" : "right";
+  logDiv.innerText = `📦${weight} kg is added to the ${sideName} side`;
+  seesawComponents.log.prepend(logDiv);
 }
 
 function updateUI() {
@@ -74,6 +91,90 @@ function updateUI() {
   seesawComponents.rightWeightsSumVal.innerText = totalRight + " kg";
 }
 
+function createObject(obj, isNew = false) {
+  const weightDiv = document.createElement("div");
+  weightDiv.classList.add("object");
+
+  const size = 20 + (obj.weight - 1) * (20 / 9);
+  weightDiv.style.left = obj.position - size / 2 + "px";
+  weightDiv.style.top = (20 - size) / 2 + "px";
+
+  weightDiv.style.width = size + "px";
+  weightDiv.style.height = size + "px";
+  weightDiv.style.fontSize = size / 2 + "px";
+  weightDiv.innerText = obj.weight;
+  weightDiv.style.backgroundColor = getWeightColor(obj.weight);
+  seesawComponents.plank.appendChild(weightDiv);
+
+  if (isNew) {
+    weightDiv.style.opacity = "0";
+
+    const rect = weightDiv.getBoundingClientRect();
+    //creating Stunt/ghost for animation
+    const ghost = weightDiv.cloneNode(true);
+    ghost.style.opacity = "1";
+    ghost.style.position = "fixed";
+    ghost.style.zIndex = "1000";
+    ghost.style.margin = "0";
+    ghost.style.transform = "none";
+    ghost.style.left = rect.left + "px";
+    ghost.style.top = rect.top - 200 + "px";
+    ghost.style.transition = "top 0.5s ease-in";
+
+    document.body.appendChild(ghost);
+
+    requestAnimationFrame(() => {
+      ghost.style.top = rect.top + "px";
+    });
+
+    //remove ghost and show real object/weight
+    setTimeout(() => {
+      ghost.remove();
+      weightDiv.style.opacity = "1";
+      audio.drop.pause();
+      updateSimulation();
+    }, 500);
+  }
+}
+
+function renderAllObjects() {
+  appState.leftWeights.forEach((obj) => createObject(obj, false));
+  appState.rightWeights.forEach((obj) => createObject(obj, false));
+
+  updateSimulation();
+}
+
+function updateSimulation() {
+  let leftTorque = 0;
+  const previousAngle = appState.angle;
+
+  appState.leftWeights.forEach((obj) => {
+    leftTorque += obj.weight * obj.distance;
+  });
+
+  let rightTorque = 0;
+  appState.rightWeights.forEach((obj) => {
+    rightTorque += obj.weight * obj.distance;
+  });
+
+  const torqueDifference = rightTorque - leftTorque;
+  const rawAngle = torqueDifference / 10;
+
+  const angle = Math.max(-30, Math.min(30, rawAngle));
+  appState.angle = angle;
+  seesawComponents.plank.style.transform = `translate(-50%, -50%) rotate(${appState.angle}deg)`;
+
+  updateUI();
+  //if angle difference is lower than 1, no sound effect
+  if (Math.abs(appState.angle - previousAngle) > 1) {
+    audio.crack.currentTime = 0;
+
+    audio.crack.currentTime = 0;
+    audio.crack.volume = 0.5;
+    audio.crack.play();
+  }
+}
+
 seesawComponents.container.addEventListener("mousemove", (e) => {
   const rect = seesawComponents.container.getBoundingClientRect();
 
@@ -83,6 +184,7 @@ seesawComponents.container.addEventListener("mousemove", (e) => {
   const centerY = rect.height / 2;
   const distanceFromCenter = x - centerX;
   const angleInRadians = appState.angle * (Math.PI / 180);
+  //vertical distance
   const verticalOffset = distanceFromCenter * Math.tan(angleInRadians);
   const plankPositionY = centerY + verticalOffset - 10;
   const limit = plankPositionY - 60;
@@ -116,7 +218,6 @@ seesawComponents.container.addEventListener("click", (e) => {
   const side = x < pivotPoint ? "left" : "right";
 
   const newObject = {
-    id: Date.now(),
     weight: weight,
     distance: distanceFromPivot,
     position: x,
@@ -133,7 +234,7 @@ seesawComponents.container.addEventListener("click", (e) => {
   audio.drop.currentTime = 0;
   audio.drop.play();
 
-  createObjectDOM(newObject, true);
+  createObject(newObject, true);
   createLogMessage(side, weight);
   generateNextWeight();
   updateUI();
@@ -143,88 +244,6 @@ seesawComponents.container.addEventListener("click", (e) => {
 seesawComponents.container.addEventListener("mouseleave", () => {
   seesawComponents.nextWeightDisplay.style.display = "none";
 });
-
-function createObjectDOM(obj, isNew = false) {
-  const weightDiv = document.createElement("div");
-  weightDiv.classList.add("object");
-
-  const size = 20 + (obj.weight - 1) * (20 / 9);
-  weightDiv.style.left = obj.position - size / 2 + "px";
-  weightDiv.style.top = (20 - size) / 2 + "px";
-  weightDiv.style.width = size + "px";
-  weightDiv.style.height = size + "px";
-  weightDiv.style.fontSize = size / 2 + "px";
-  weightDiv.innerText = obj.weight;
-  weightDiv.style.backgroundColor = getWeightColor(obj.weight);
-  seesawComponents.plank.appendChild(weightDiv);
-
-  if (isNew) {
-    weightDiv.style.opacity = "0";
-
-    const rect = weightDiv.getBoundingClientRect();
-
-    const ghost = weightDiv.cloneNode(true);
-    ghost.style.opacity = "1";
-    ghost.style.position = "fixed";
-    ghost.style.zIndex = "1000";
-    ghost.style.margin = "0";
-    ghost.style.transform = "none";
-    ghost.style.left = rect.left + "px";
-    ghost.style.top = rect.top - 200 + "px";
-    ghost.style.transition = "top 0.5s ease-in";
-
-    document.body.appendChild(ghost);
-
-    requestAnimationFrame(() => {
-      ghost.style.top = rect.top + "px";
-    });
-
-    setTimeout(() => {
-      ghost.remove();
-      weightDiv.style.opacity = "1";
-      audio.drop.pause();
-      updateSimulation();
-    }, 500);
-  }
-}
-function getWeightColor(weight) {
-  return seesawComponents.colors[weight - 1];
-}
-function updateSimulation() {
-  let leftTorque = 0;
-  const previousAngle = appState.angle;
-
-  appState.leftWeights.forEach((obj) => {
-    leftTorque += obj.weight * obj.distance;
-  });
-
-  let rightTorque = 0;
-  appState.rightWeights.forEach((obj) => {
-    rightTorque += obj.weight * obj.distance;
-  });
-
-  const torqueDifference = rightTorque - leftTorque;
-  const rawAngle = torqueDifference / 10;
-  const angle = Math.max(-30, Math.min(30, rawAngle));
-  appState.angle = angle;
-  seesawComponents.plank.style.transform = `translate(-50%, -50%) rotate(${appState.angle}deg)`;
-
-  updateUI();
-  if (Math.abs(appState.angle - previousAngle) > 1) {
-    audio.crack.currentTime = 0;
-
-    audio.crack.currentTime = 0;
-    audio.crack.volume = 0.5;
-    audio.crack.play();
-  }
-}
-
-function renderAllObjects() {
-  appState.leftWeights.forEach((obj) => createObjectDOM(obj), false);
-  appState.rightWeights.forEach((obj) => createObjectDOM(obj), false);
-
-  updateSimulation();
-}
 
 seesawComponents.resetButton.addEventListener("click", () => {
   appState.leftWeights = [];
@@ -242,28 +261,18 @@ seesawComponents.resetButton.addEventListener("click", () => {
   updateUI();
 });
 
-function createLogMessage(side, weight) {
-  const logDiv = document.createElement("div");
-  logDiv.classList.add("log-item");
-  let sideName = side === "left" ? "left" : "right";
-  logDiv.innerText = `📦${weight} kg is added to the ${sideName} side`;
-  seesawComponents.log.prepend(logDiv);
-}
-function createRuler() {
-  const plankWidth = 400;
-  const distance = 20;
+function init() {
+  createRuler();
+  const previousState = localStorage.getItem("seesawState");
 
-  for (let i = distance; i < plankWidth; i += distance) {
-    if (i === plankWidth / 2) continue;
-
-    const line = document.createElement("div");
-    const unit = Math.abs(i - plankWidth / 2) / distance;
-
-    const label = document.createElement("div");
-    label.classList.add("scale-label");
-    label.style.left = i + "px";
-    label.innerText = unit;
-    seesawComponents.plank.appendChild(label);
+  if (previousState) {
+    appState = JSON.parse(previousState);
+    renderAllObjects();
+  } else {
+    generateNextWeight();
   }
+
+  updateUI();
 }
+
 init();
