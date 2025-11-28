@@ -21,12 +21,16 @@ const seesawComponents = {
     "#d35400",
   ],
 };
-
 let appState = {
   nextWeight: 0,
   leftWeights: [],
   rightWeights: [],
   colors: [],
+};
+
+const audio = {
+  drop: new Audio("sounds/weightDrop.mp3"),
+  crack: new Audio("sounds/woodCrack.mp3"),
 };
 
 function init() {
@@ -51,7 +55,7 @@ function generateNextWeight() {
 }
 
 function updateUI() {
-  seesawComponents.nextWeightVal.innerText = appState.nextWeight;
+  seesawComponents.nextWeightVal.innerText = appState.nextWeight + " kg";
   seesawComponents.angle.innerText = Math.round(appState.angle);
 
   let totalLeft = 0;
@@ -64,8 +68,8 @@ function updateUI() {
     totalRight += obj.weight;
   }
 
-  seesawComponents.leftWeightsSumVal.innerText = totalLeft;
-  seesawComponents.rightWeightsSumVal.innerText = totalRight;
+  seesawComponents.leftWeightsSumVal.innerText = totalLeft + " kg";
+  seesawComponents.rightWeightsSumVal.innerText = totalRight + " kg";
 }
 
 seesawComponents.container.addEventListener("mousemove", (e) => {
@@ -123,6 +127,10 @@ seesawComponents.container.addEventListener("click", (e) => {
     appState.rightWeights.push(newObject);
   }
 
+  audio.drop.pause();
+  audio.drop.currentTime = 0;
+  audio.drop.play();
+
   createObjectDOM(newObject, true);
   createLogMessage(side, weight);
   generateNextWeight();
@@ -172,6 +180,7 @@ function createObjectDOM(obj, isNew = false) {
     setTimeout(() => {
       ghost.remove();
       weightDiv.style.opacity = "1";
+      audio.drop.pause();
       updateSimulation();
     }, 500);
   }
@@ -181,6 +190,8 @@ function getWeightColor(weight) {
 }
 function updateSimulation() {
   let leftTorque = 0;
+  const previousAngle = appState.angle;
+
   appState.leftWeights.forEach((obj) => {
     leftTorque += obj.weight * obj.distance;
   });
@@ -197,6 +208,13 @@ function updateSimulation() {
   seesawComponents.plank.style.transform = `translate(-50%, -50%) rotate(${appState.angle}deg)`;
 
   updateUI();
+  if (Math.abs(appState.angle - previousAngle) > 1) {
+    audio.crack.currentTime = 0;
+
+    audio.crack.currentTime = 0;
+    audio.crack.volume = 0.5;
+    audio.crack.play();
+  }
 }
 
 function renderAllObjects() {
